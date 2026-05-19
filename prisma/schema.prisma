@@ -1,0 +1,234 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── ENUMS ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  ADMIN
+}
+
+enum UoMType {
+  MIN        // Higher is better (Achievement / Target)
+  MAX        // Lower is better (Target / Achievement)
+  TIMELINE   // Date-based completion
+  ZERO       // Zero = 100%, else 0%
+}
+
+enum GoalStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  RETURNED
+  LOCKED
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  ON_TRACK
+  COMPLETED
+  AT_RISK
+}
+
+enum CheckinPeriod {
+  Q1
+  Q2
+  Q3
+  Q4
+  ANNUAL
+}
+
+enum AuditAction {
+  CREATED
+  UPDATED
+  SUBMITTED
+  APPROVED
+  RETURNED
+  LOCKED
+  UNLOCKED
+  ACHIEVEMENT_UPDATED
+  CHECKIN_ADDED
+  SHARED
+}
+
+enum CyclePhase {
+  GOAL_SETTING
+  Q1_CHECKIN
+  Q2_CHECKIN
+  Q3_CHECKIN
+  Q4_ANNUAL
+}
+
+// ─── CORE MODELS ─────────────────────────────────────────────────────────────
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  employeeId    String?  @unique
+  role          Role     @default(EMPLOYEE)
+  department    String?
+  designation   String?
+  managerId     String?
+  manager       User?    @relation("ReportsTo", fields: [managerId], references: [id])
+  directReports User[]   @relation("ReportsTo")
+  passwordHash  String?
+  azureAdId     String?  @unique
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  goals              Goal[]       @relation("GoalOwner")
+  approvedGoals      Goal[]       @relation("GoalApprover")
+  checkins           Checkin[]    @relation("CheckinEmployee")
+  managerCheckins    Checkin[]    @relation("CheckinManager")
+  auditLogs          AuditLog[]
+  sharedGoalRecipients SharedGoalRecipient[]
+  escalations        Escalation[]
+
+  @@map("users")
+}
+
+model Cycle {
+  id          String     @id @default(cuid())
+  name        String     // e.g. "FY 2025-26"
+  phase       CyclePhase @default(GOAL_SETTING)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  goals    Goal[]
+  checkins Checkin[]
+
+  @@map("cycles")
+}
+
+model ThrustArea {
+  id          String @id @default(cuid())
+  name        String @unique
+  description String?
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+
+  goals Goal[]
+
+  @@map("thrust_areas")
+}
+
+model Goal {
+  id            String       @id @default(cuid())
+  title         String
+  description   String?
+  thrustAreaId  String
+  thrustArea    ThrustArea   @relation(fields: [thrustAreaId], references: [id])
+  uomType       UoMType
+  uomUnit       String?      // e.g., "₹ Lakhs", "%", "Days"
+  target        Float?
+  targetDate    DateTime?    // For TIMELINE type
+  weightage     Float        // Must be >= 10, sum across sheet = 100
+  status        GoalStatus   @default(DRAFT)
+  ownerId       String
+  owner         User         @relation("GoalOwner", fields: [ownerId], references: [id])
+  approverId    String?
+  approver      User?        @relation("GoalApprover", fields: [approverId], references: [id])
+  cycleId       String
+  cycle         Cycle        @relation(fields: [cycleId], references: [id])
+  isShared      Boolean      @default(false)
+  parentGoalId  String?      // For shared goals, points to primary goal
+  parentGoal    Goal?        @relation("SharedGoal", fields: [parentGoalId], references: [id])
+  childGoals    Goal[]       @relation("SharedGoal")
+  managerComment String?
+  aiQualityScore Float?      // AI-generated quality score 0-100
+  aiSuggestions  String?     // AI-generated suggestions (JSON string)
+  lockedAt      DateTime?
+  submittedAt   DateTime?
+  approvedAt    DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  checkins    Checkin[]
+  auditLogs   AuditLog[]
+  sharedWith  SharedGoalRecipient[]
+
+  @@map("goals")
+}
+
+model SharedGoalRecipient {
+  id         String @id @default(cuid())
+  goalId     String
+  goal       Goal   @relation(fields: [goalId], references: [id])
+  userId     String
+  user       User   @relation(fields: [userId], references: [id])
+  weightage  Float  // Recipient can only change weightage
+  createdAt  DateTime @default(now())
+
+  @@unique([goalId, userId])
+  @@map("shared_goal_recipients")
+}
+
+model Checkin {
+  id              String         @id @default(cuid())
+  goalId          String
+  goal            Goal           @relation(fields: [goalId], references: [id])
+  employeeId      String
+  employee        User           @relation("CheckinEmployee", fields: [employeeId], references: [id])
+  managerId       String?
+  manager         User?          @relation("CheckinManager", fields: [managerId], references: [id])
+  cycleId         String
+  cycle           Cycle          @relation(fields: [cycleId], references: [id])
+  period          CheckinPeriod
+  plannedTarget   Float?
+  actualAchievement Float?
+  completionDate  DateTime?      // For TIMELINE type
+  progressStatus  ProgressStatus @default(NOT_STARTED)
+  progressScore   Float?         // System-computed
+  employeeNote    String?
+  managerComment  String?
+  aiSummary       String?        // AI-generated check-in summary
+  completedAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([goalId, period, cycleId])
+  @@map("checkins")
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  goalId     String?
+  goal       Goal?       @relation(fields: [goalId], references: [id])
+  userId     String
+  user       User        @relation(fields: [userId], references: [id])
+  action     AuditAction
+  field      String?     // Which field was changed
+  oldValue   String?
+  newValue   String?
+  note       String?
+  createdAt  DateTime    @default(now())
+
+  @@map("audit_logs")
+}
+
+model Escalation {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // "GOAL_NOT_SUBMITTED", "APPROVAL_PENDING", "CHECKIN_OVERDUE"
+  message     String
+  resolved    Boolean  @default(false)
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@map("escalations")
+}
