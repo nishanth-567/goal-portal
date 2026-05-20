@@ -244,5 +244,5 @@ Write in a direct, professional tone. Highlight what's working and what needs at
     messages: [{ role: "user", content: prompt }],
   });
 
-  return response.content[0].type === "text" ? response.content[0].text : "";
+  return response.choices[0]?.message?.content || "";
 }
