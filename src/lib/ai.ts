@@ -51,7 +51,7 @@ Respond with ONLY valid JSON, no markdown:
   "suggestions": ["suggestion 1", "suggestion 2", "suggestion 3"]
 }`;
 
-  const response = await client.messages.create({
+  const response = await client.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     max_tokens: 600,
     messages: [{ role: "user", content: prompt }],
@@ -99,7 +99,7 @@ Respond with ONLY valid JSON array, no markdown:
   }
 ]`;
 
-  const response = await client.messages.create({
+  const response = await client.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     max_tokens: 1000,
     messages: [{ role: "user", content: prompt }],
@@ -146,7 +146,7 @@ Respond with ONLY valid JSON, no markdown:
   "uomUnit": "unit string e.g. %, ₹ Lakhs, Days" or null
 }`;
 
-  const response = await client.messages.create({
+  const response = await client.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     max_tokens: 400,
     messages: [{ role: "user", content: prompt }],
@@ -205,7 +205,7 @@ Write a professional performance summary. Respond with ONLY valid JSON, no markd
   "overallSentiment": "positive|neutral|needs_attention"
 }`;
 
-  const response = await client.messages.create({
+  const response = await client.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     max_tokens: 800,
     messages: [{ role: "user", content: prompt }],
@@ -238,7 +238,7 @@ Top Performers: ${data.topPerformers.join(", ") || "N/A"}
 
 Write in a direct, professional tone. Highlight what's working and what needs attention. No bullet points, just prose.`;
 
-  const response = await client.messages.create({
+  const response = await client.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     max_tokens: 300,
     messages: [{ role: "user", content: prompt }],
