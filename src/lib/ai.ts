@@ -57,7 +57,7 @@ Respond with ONLY valid JSON, no markdown:
     messages: [{ role: "user", content: prompt }],
   });
 
-  const text = response.content[0].type === "text" ? response.content[0].text : "";
+  const text = response.choices[0]?.message?.content || "";
   const clean = text.replace(/```json|```/g, "").trim();
   return JSON.parse(clean);
 }
@@ -105,7 +105,7 @@ Respond with ONLY valid JSON array, no markdown:
     messages: [{ role: "user", content: prompt }],
   });
 
-  const text = response.content[0].type === "text" ? response.content[0].text : "";
+  const text = response.choices[0]?.message?.content || "";
   const clean = text.replace(/```json|```/g, "").trim();
   return JSON.parse(clean);
 }
@@ -152,7 +152,7 @@ Respond with ONLY valid JSON, no markdown:
     messages: [{ role: "user", content: prompt }],
   });
 
-  const text = response.content[0].type === "text" ? response.content[0].text : "";
+  const text = response.choices[0]?.message?.content || "";
   const clean = text.replace(/```json|```/g, "").trim();
   return JSON.parse(clean);
 }
@@ -211,7 +211,7 @@ Write a professional performance summary. Respond with ONLY valid JSON, no markd
     messages: [{ role: "user", content: prompt }],
   });
 
-  const text = response.content[0].type === "text" ? response.content[0].text : "";
+  const text = response.choices[0]?.message?.content || "";
   const clean = text.replace(/```json|```/g, "").trim();
   return JSON.parse(clean);
 }
