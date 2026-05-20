@@ -52,7 +52,7 @@ Respond with ONLY valid JSON, no markdown:
 }`;
 
   const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "llama-3.3-70b-versatile",
     max_tokens: 600,
     messages: [{ role: "user", content: prompt }],
   });
@@ -100,7 +100,7 @@ Respond with ONLY valid JSON array, no markdown:
 ]`;
 
   const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "llama-3.3-70b-versatile",
     max_tokens: 1000,
     messages: [{ role: "user", content: prompt }],
   });
@@ -147,7 +147,7 @@ Respond with ONLY valid JSON, no markdown:
 }`;
 
   const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "llama-3.3-70b-versatile",
     max_tokens: 400,
     messages: [{ role: "user", content: prompt }],
   });
@@ -206,7 +206,7 @@ Write a professional performance summary. Respond with ONLY valid JSON, no markd
 }`;
 
   const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "llama-3.3-70b-versatile",
     max_tokens: 800,
     messages: [{ role: "user", content: prompt }],
   });
@@ -239,7 +239,7 @@ Top Performers: ${data.topPerformers.join(", ") || "N/A"}
 Write in a direct, professional tone. Highlight what's working and what needs attention. No bullet points, just prose.`;
 
   const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "llama-3.3-70b-versatile",
     max_tokens: 300,
     messages: [{ role: "user", content: prompt }],
   });
