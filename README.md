@@ -10,7 +10,7 @@ A full-stack performance management portal built with Next.js 14, PostgreSQL, Pr
 - **AI**: Anthropic Claude API
 
 ## Demo Accounts
-| Role | Email | Password |
+| Role | Email | Password | 
 |------|-------|----------|
 | Employee | employee@demo.com | demo123 |
 | Manager | manager@demo.com | demo123 |
