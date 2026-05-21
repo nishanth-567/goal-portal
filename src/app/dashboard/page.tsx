@@ -62,7 +62,7 @@ export default async function DashboardPage() {
     returnedGoals: myGoals.filter((g) => g.status === "RETURNED").length,
     totalWeightage: myGoals.reduce((s, g) => s + g.weightage, 0),
     completedCheckins: myGoals.filter((g) =>
-      g.checkins.some((c) => c.progressStatus === "COMPLETED")
+      g.checkins.some((c: any) => c.progressStatus === "COMPLETED")
     ).length,
   };
 
