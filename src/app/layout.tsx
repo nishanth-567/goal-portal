@@ -9,13 +9,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={{ backgroundColor: "rgb(8,8,12)" }}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <style>{`
+          html, body, #__next { 
+            background-color: rgb(8, 8, 12) !important; 
+            color: white !important;
+            min-height: 100vh;
+          }
+        `}</style>
       </head>
-      <body style={{ background: "rgb(8,8,12)", color: "white", margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
+      <body style={{ backgroundColor: "rgb(8,8,12)", color: "white", margin: 0, minHeight: "100vh" }}>
         <Providers>{children}</Providers>
       </body>
     </html>
