@@ -10,42 +10,48 @@ export default async function DashboardPage() {
   const userId = session.user.id;
   const role = session.user.role;
 
-  // Get active cycle
-  const cycle = await prisma.cycle.findFirst({ where: { isActive: true } });
-
-  // Employee stats
-  const myGoals = cycle
-    ? await prisma.goal.findMany({
-        where: { ownerId: userId, cycleId: cycle.id },
-        include: { thrustArea: true, checkins: true },
-      })
-    : [];
-
-  // Manager stats
+  let cycle = null;
+  let myGoals: any[] = [];
   let teamStats = null;
-  if (role === "MANAGER" || role === "ADMIN") {
-    const teamFilter = role === "MANAGER" ? { managerId: userId } : {};
-    const teamUsers = await prisma.user.findMany({
-      where: { ...teamFilter, isActive: true, role: "EMPLOYEE" },
-      select: { id: true, name: true },
-    });
-    const teamGoals = cycle
+
+  try {
+    cycle = await prisma.cycle.findFirst({ where: { isActive: true } });
+
+    myGoals = cycle
       ? await prisma.goal.findMany({
-          where: {
-            ownerId: { in: teamUsers.map((u) => u.id) },
-            cycleId: cycle.id,
-          },
-          include: { checkins: true },
+          where: { ownerId: userId, cycleId: cycle.id },
+          include: { thrustArea: true, checkins: true },
         })
       : [];
 
-    teamStats = {
-      teamSize: teamUsers.length,
-      totalGoals: teamGoals.length,
-      lockedGoals: teamGoals.filter((g) => g.status === "LOCKED").length,
-      pendingApproval: teamGoals.filter((g) => g.status === "SUBMITTED").length,
-      atRisk: teamGoals.filter((g) => g.checkins.some((c) => c.progressStatus === "AT_RISK")).length,
-    };
+    if (role === "MANAGER" || role === "ADMIN") {
+      const teamFilter = role === "MANAGER" ? { managerId: userId } : {};
+      const teamUsers = await prisma.user.findMany({
+        where: { ...teamFilter, isActive: true, role: "EMPLOYEE" },
+        select: { id: true, name: true },
+      });
+      const teamGoals = cycle
+        ? await prisma.goal.findMany({
+            where: {
+              ownerId: { in: teamUsers.map((u) => u.id) },
+              cycleId: cycle.id,
+            },
+            include: { checkins: true },
+          })
+        : [];
+
+      teamStats = {
+        teamSize: teamUsers.length,
+        totalGoals: teamGoals.length,
+        lockedGoals: teamGoals.filter((g) => g.status === "LOCKED").length,
+        pendingApproval: teamGoals.filter((g) => g.status === "SUBMITTED").length,
+        atRisk: teamGoals.filter((g) =>
+          g.checkins.some((c) => c.progressStatus === "AT_RISK")
+        ).length,
+      };
+    }
+  } catch (error) {
+    console.error("Dashboard error:", error);
   }
 
   const stats = {
