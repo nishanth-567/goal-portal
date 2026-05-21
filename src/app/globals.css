@@ -1,3 +1,8 @@
+html, body, #__next {
+  background: rgb(8, 8, 12) !important;
+  color: white !important;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
