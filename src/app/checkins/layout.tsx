@@ -6,10 +6,13 @@ import { Sidebar } from "@/components/shared/Sidebar";
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
+
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#08080C" }}>
       <Sidebar />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main style={{ flex: 1, overflow: "auto", backgroundColor: "#08080C" }}>
+        {children}
+      </main>
     </div>
   );
 }
