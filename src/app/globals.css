@@ -1,6 +1,12 @@
 @tailwind components;
 @tailwind utilities;
 
+html { background-color: #08080C !important; }
+body { background-color: #08080C !important; color: white !important; }
+main { background-color: #08080C !important; }
+aside { background-color: #08080C !important; }
+div { color: inherit; }
+
 html, body, #__next {
   background-color: rgb(8, 8, 12) !important;
   color: white !important;
