@@ -3,19 +3,17 @@ import "./globals.css";
 import { Providers } from "@/components/shared/Providers";
 
 export const metadata: Metadata = {
-  title: "GOALPOCALYPSE — Performance War Room",
-  description: "Goal Setting & Tracking Portal",
+  title: "GOALPOCALYPSE",
+  description: "Performance Management. Redefined.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning style={{ backgroundColor: "#08080C" }}>
+    <html lang="en" suppressHydrationWarning style={{ backgroundColor: "#000000" }}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <meta name="theme-color" content="#000000" />
       </head>
-      <body style={{ backgroundColor: "#08080C", color: "white", margin: 0, padding: 0, minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>
+      <body style={{ backgroundColor: "#000000", color: "#FFFFFF", margin: 0, padding: 0, minHeight: "100vh" }}>
         <Providers>{children}</Providers>
       </body>
     </html>
