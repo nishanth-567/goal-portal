@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "@/components/shared/Providers";
 
 export const metadata: Metadata = {
-  title: "GOALPOCALYPSE",
+  title: "Meridian.",
   description: "Performance Management. Redefined.",
 };
 
