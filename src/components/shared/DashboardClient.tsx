@@ -1,118 +1,121 @@
 "use client";
-import { Target, CheckSquare, AlertCircle, Clock, TrendingUp, Users, Sparkles, ChevronRight, Zap, Flame } from "lucide-react";
+import { Target, CheckSquare, AlertCircle, Clock, TrendingUp, Users, Sparkles, ArrowRight, Activity } from "lucide-react";
 import Link from "next/link";
 
 interface Props { session: any; stats: any; teamStats: any; cycle: any; recentGoals: any[]; }
 
 const STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
   DRAFT: { label: "Draft", cls: "badge badge-draft" },
-  SUBMITTED: { label: "Submitted", cls: "badge badge-submitted" },
+  SUBMITTED: { label: "In Review", cls: "badge badge-submitted" },
   APPROVED: { label: "Approved", cls: "badge badge-approved" },
   RETURNED: { label: "Returned", cls: "badge badge-returned" },
-  LOCKED: { label: "Locked", cls: "badge badge-locked" },
+  LOCKED: { label: "Active", cls: "badge badge-locked" },
 };
 
-function KpiCard({ label, value, icon: Icon, color, sub, delay = "0" }: any) {
+function StatCard({ label, value, icon: Icon, accent, sub, delay }: any) {
   return (
-    <div className={`glass-card slide-up-${delay}`} style={{ borderRadius: "12px", padding: "20px", position: "relative", overflow: "hidden", transition: "transform 0.2s", cursor: "default" }}
-      onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-2px)")}
-      onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: color }} />
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}>
-        <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: `${color}20`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `1px solid ${color}30` }}>
-          <Icon size={18} style={{ color }} />
-        </div>
-        <div>
-          <p style={{ fontSize: "26px", fontWeight: 700, color: "white", lineHeight: 1 }}>{value}</p>
-          <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", marginTop: "3px" }}>{label}</p>
-          {sub && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.25)", marginTop: "2px" }}>{sub}</p>}
+    <div className={`glass card-hover fade-up-${delay}`} style={{ borderRadius: "16px", padding: "24px", position: "relative", overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "16px" }}>
+        <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: `${accent}14`, display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${accent}20` }}>
+          <Icon size={16} style={{ color: accent }} strokeWidth={2} />
         </div>
       </div>
+      <p style={{ fontSize: "32px", fontWeight: 700, color: "white", letterSpacing: "-0.03em", lineHeight: 1 }}>{value}</p>
+      <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", marginTop: "6px", fontWeight: 500 }}>{label}</p>
+      {sub && <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.2)", marginTop: "3px" }}>{sub}</p>}
     </div>
   );
 }
 
 export function DashboardClient({ session, stats, teamStats, cycle, recentGoals }: Props) {
-  const name = session.user.name?.split(" ")[0] || "Warrior";
+  const name = session.user.name?.split(" ")[0] || "there";
   const role = session.user.role;
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? "RISE AND GRIND" : hour < 17 ? "STAY LOCKED IN" : "FINISH STRONG";
 
   return (
-    <div style={{ padding: "32px", maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+    <div style={{ padding: "48px 48px 48px", maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
 
       {/* Header */}
-      <div className="slide-up" style={{ marginBottom: "32px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
-          <Flame size={20} style={{ color: "#FF6B00" }} />
-          <p style={{ fontSize: "12px", color: "#FF6B00", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em" }}>{greeting}, {name}</p>
-        </div>
-        <h1 className="font-display" style={{ fontSize: "42px", color: "white", lineHeight: 1, marginBottom: "8px" }}>
-          YOUR <span style={{ color: "#FF6B00" }} className="text-glow-fire">WAR ROOM</span>
+      <div className="fade-up" style={{ marginBottom: "48px" }}>
+        <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", fontWeight: 500, marginBottom: "8px", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+          {cycle ? cycle.name : "No Active Cycle"} · {cycle?.phase?.replace(/_/g, " ")}
+        </p>
+        <h1 style={{ fontSize: "48px", fontWeight: 700, color: "white", letterSpacing: "-0.03em", lineHeight: 1.05, marginBottom: "12px" }}>
+          Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"},<br />
+          <span style={{ color: "rgba(255,255,255,0.4)" }}>{name}.</span>
         </h1>
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "14px" }}>
-          {cycle ? `Active cycle: ${cycle.name}` : "No active cycle — contact admin"}
+        <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.35)", fontWeight: 400 }}>
+          {stats.lockedGoals > 0 ? `${stats.lockedGoals} goals active. ${stats.submittedGoals > 0 ? `${stats.submittedGoals} awaiting review.` : "Keep pushing."}` : "No goals locked yet. Start building your plan."}
         </p>
       </div>
 
-      {/* My Goal Stats */}
-      <div style={{ marginBottom: "8px" }}>
-        <p style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: "12px" }}>My Arsenal</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "24px" }}>
-          <KpiCard label="Total Goals" value={stats.totalGoals} icon={Target} color="#FF6B00" sub={`${stats.totalWeightage}% weighted`} delay="1" />
-          <KpiCard label="Locked & Loaded" value={stats.lockedGoals} icon={CheckSquare} color="#00D4FF" delay="2" />
-          <KpiCard label="Awaiting Review" value={stats.submittedGoals} icon={Clock} color="#FF8C00" delay="3" />
-          <KpiCard label="Needs Rework" value={stats.returnedGoals} icon={AlertCircle} color="#FF4500" delay="4" />
-        </div>
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "48px" }}>
+        <StatCard label="Total Goals" value={stats.totalGoals} icon={Target} accent="#FF4500" sub={`${stats.totalWeightage}% weighted`} delay="1" />
+        <StatCard label="Active Goals" value={stats.lockedGoals} icon={Activity} accent="#34C759" delay="2" />
+        <StatCard label="In Review" value={stats.submittedGoals} icon={Clock} accent="#FFA500" delay="3" />
+        <StatCard label="Need Attention" value={stats.returnedGoals} icon={AlertCircle} accent="#FF4500" delay="4" />
       </div>
 
-      {/* Team Stats */}
+      {/* Team stats */}
       {teamStats && (
-        <div style={{ marginBottom: "24px" }}>
-          <p style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: "12px" }}>Team Intel</p>
+        <div style={{ marginBottom: "48px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+            <p style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.3)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Team Performance</p>
+            <Link href="/analytics" style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", textDecoration: "none", display: "flex", alignItems: "center", gap: "4px" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "white")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}>
+              View analytics <ArrowRight size={13} />
+            </Link>
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px" }}>
-            <KpiCard label="Soldiers" value={teamStats.teamSize} icon={Users} color="#BF00FF" />
-            <KpiCard label="Goals Locked" value={teamStats.lockedGoals} icon={CheckSquare} color="#00D4FF" sub={`of ${teamStats.totalGoals}`} />
-            <KpiCard label="Pending Approval" value={teamStats.pendingApproval} icon={Clock} color="#FF8C00" />
-            <KpiCard label="At Risk" value={teamStats.atRisk} icon={AlertCircle} color="#FF4500" />
+            <StatCard label="Team Members" value={teamStats.teamSize} icon={Users} accent="#007AFF" delay="1" />
+            <StatCard label="Goals Active" value={teamStats.lockedGoals} icon={CheckSquare} accent="#34C759" sub={`of ${teamStats.totalGoals}`} delay="2" />
+            <StatCard label="Pending Approval" value={teamStats.pendingApproval} icon={Clock} accent="#FFA500" delay="3" />
+            <StatCard label="At Risk" value={teamStats.atRisk} icon={AlertCircle} accent="#FF4500" delay="4" />
           </div>
         </div>
       )}
 
-      {/* Bottom grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "16px" }}>
+      {/* Bottom */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "16px" }}>
 
-        {/* Recent goals */}
-        <div className="glass-card" style={{ borderRadius: "12px", overflow: "hidden" }}>
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <p style={{ fontWeight: 700, color: "white", fontSize: "14px" }}>Recent Goals</p>
-            <Link href="/goals" style={{ fontSize: "12px", color: "#FF6B00", textDecoration: "none", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
-              View all <ChevronRight size={13} />
+        {/* Goals list */}
+        <div className="glass" style={{ borderRadius: "16px", overflow: "hidden" }}>
+          <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <p style={{ fontSize: "15px", fontWeight: 600, color: "white", letterSpacing: "-0.01em" }}>Recent Goals</p>
+            <Link href="/goals" style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", textDecoration: "none", display: "flex", alignItems: "center", gap: "4px", transition: "color 0.15s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "white")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}>
+              View all <ArrowRight size={13} />
             </Link>
           </div>
           {recentGoals.length === 0 ? (
-            <div style={{ padding: "40px", textAlign: "center" }}>
-              <Target size={40} style={{ color: "rgba(255,255,255,0.1)", margin: "0 auto 12px" }} />
-              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "14px" }}>No goals yet. Start your apocalypse.</p>
-              <Link href="/goals/new" style={{ display: "inline-block", marginTop: "12px", padding: "8px 16px", background: "linear-gradient(135deg, #FF6B00, #FF4500)", borderRadius: "8px", color: "white", textDecoration: "none", fontSize: "13px", fontWeight: 600 }}>
-                Create First Goal →
+            <div style={{ padding: "48px 24px", textAlign: "center" }}>
+              <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <Target size={22} style={{ color: "rgba(255,255,255,0.2)" }} />
+              </div>
+              <p style={{ fontSize: "15px", fontWeight: 500, color: "rgba(255,255,255,0.4)", marginBottom: "6px" }}>No goals yet</p>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.2)", marginBottom: "20px" }}>Start building your performance plan.</p>
+              <Link href="/goals/new" className="btn-primary" style={{ textDecoration: "none", fontSize: "13px", padding: "10px 20px" }}>
+                Create first goal
               </Link>
             </div>
           ) : (
-            recentGoals.map((goal) => {
+            recentGoals.map((goal, i) => {
               const cfg = STATUS_CONFIG[goal.status] || STATUS_CONFIG.DRAFT;
               const lastCheckin = goal.checkins?.[goal.checkins.length - 1];
               return (
-                <Link key={goal.id} href={`/goals/${goal.id}`} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 20px", textDecoration: "none", borderBottom: "1px solid rgba(255,255,255,0.04)", transition: "background 0.2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,107,0,0.05)")}
+                <Link key={goal.id} href={`/goals/${goal.id}`} style={{ display: "flex", alignItems: "center", gap: "16px", padding: "16px 24px", textDecoration: "none", borderBottom: i < recentGoals.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", transition: "background 0.15s" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.025)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: goal.status === "LOCKED" ? "#34C759" : goal.status === "SUBMITTED" ? "#FFA500" : "rgba(255,255,255,0.15)", flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: "13px", fontWeight: 600, color: "white", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{goal.title}</p>
-                    <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "2px" }}>{goal.thrustArea?.name} · {goal.weightage}%</p>
+                    <p style={{ fontSize: "14px", fontWeight: 500, color: "white", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: "-0.01em" }}>{goal.title}</p>
+                    <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.25)", marginTop: "2px" }}>{goal.thrustArea?.name} · {goal.weightage}% weight</p>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
                     {lastCheckin?.progressScore != null && (
-                      <span style={{ fontSize: "11px", fontWeight: 700, color: lastCheckin.progressScore >= 80 ? "#CCFF00" : lastCheckin.progressScore >= 60 ? "#00D4FF" : "#FF4500" }}>
+                      <span style={{ fontSize: "13px", fontWeight: 700, color: lastCheckin.progressScore >= 80 ? "#34C759" : lastCheckin.progressScore >= 60 ? "#007AFF" : "#FF4500" }}>
                         {lastCheckin.progressScore.toFixed(0)}%
                       </span>
                     )}
@@ -128,35 +131,31 @@ export function DashboardClient({ session, stats, teamStats, cycle, recentGoals 
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
 
           {/* AI card */}
-          <div style={{ borderRadius: "12px", padding: "20px", background: "linear-gradient(135deg, rgba(191,0,255,0.2), rgba(0,212,255,0.1))", border: "1px solid rgba(191,0,255,0.3)", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "80px", height: "80px", borderRadius: "50%", background: "radial-gradient(circle, rgba(191,0,255,0.3), transparent)" }} />
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-              <Sparkles size={16} style={{ color: "#BF00FF" }} />
-              <span style={{ fontSize: "12px", fontWeight: 700, color: "#BF00FF", textTransform: "uppercase", letterSpacing: "0.1em" }}>AI Co-Pilot</span>
+          <div className="glass" style={{ borderRadius: "16px", padding: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+              <Sparkles size={14} style={{ color: "#FF4500" }} />
+              <span style={{ fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.5)", letterSpacing: "0.06em", textTransform: "uppercase" }}>AI Assistant</span>
             </div>
-            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", marginBottom: "14px", lineHeight: 1.5 }}>AI scores your goals, suggests improvements & summarizes check-ins.</p>
-            <Link href="/goals/new" style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", background: "rgba(191,0,255,0.3)", border: "1px solid rgba(191,0,255,0.4)", borderRadius: "8px", color: "white", textDecoration: "none", fontSize: "12px", fontWeight: 600, transition: "all 0.2s" }}>
-              <Zap size={13} /> Create with AI
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginBottom: "16px" }}>Score goal quality, get suggestions, and summarize check-ins automatically.</p>
+            <Link href="/goals/new" className="btn-secondary" style={{ textDecoration: "none", fontSize: "13px", padding: "9px 18px", width: "100%", justifyContent: "center" }}>
+              Create with AI
             </Link>
           </div>
 
           {/* Quick actions */}
-          <div className="glass-card" style={{ borderRadius: "12px", padding: "16px" }}>
-            <p style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px" }}>Quick Strikes</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              {[
-                { href: "/goals/new", label: "New Goal", icon: Target, color: "#FF6B00" },
-                { href: "/checkins", label: "Log Achievement", icon: CheckSquare, color: "#00D4FF" },
-                ...(role !== "EMPLOYEE" ? [{ href: "/team", label: "Review Team", icon: Users, color: "#BF00FF" }] : []),
-                ...(role !== "EMPLOYEE" ? [{ href: "/analytics", label: "View Analytics", icon: TrendingUp, color: "#CCFF00" }] : []),
-              ].map((item) => (
-                <Link key={item.href} href={item.href} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 10px", borderRadius: "8px", textDecoration: "none", color: "rgba(255,255,255,0.6)", fontSize: "13px", fontWeight: 500, transition: "all 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "white"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.6)"; }}>
-                  <item.icon size={14} style={{ color: item.color }} /> {item.label}
-                </Link>
-              ))}
-            </div>
+          <div className="glass" style={{ borderRadius: "16px", padding: "8px" }}>
+            {[
+              { href: "/goals/new", label: "New Goal", icon: Target },
+              { href: "/checkins", label: "Log Achievement", icon: CheckSquare },
+              ...(role !== "EMPLOYEE" ? [{ href: "/team", label: "Review Team", icon: Users }] : []),
+              ...(role !== "EMPLOYEE" ? [{ href: "/analytics", label: "Analytics", icon: TrendingUp }] : []),
+            ].map((item) => (
+              <Link key={item.href} href={item.href} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "11px 14px", borderRadius: "10px", textDecoration: "none", color: "rgba(255,255,255,0.45)", fontSize: "14px", fontWeight: 500, transition: "all 0.15s", letterSpacing: "-0.01em" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "white"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.45)"; }}>
+                <item.icon size={14} style={{ flexShrink: 0 }} /> {item.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
