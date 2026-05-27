@@ -29,7 +29,7 @@ export function Sidebar() {
           <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "#FF4500", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <Target size={16} color="white" strokeWidth={2.5} />
           </div>
-          <span style={{ fontSize: "15px", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>Goalpocalypse</span>
+          <span style={{ fontSize: "15px", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>Meridian.</span>
         </div>
       </div>
 
