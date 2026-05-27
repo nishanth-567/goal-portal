@@ -47,18 +47,18 @@ export default function LoginPage() {
           <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#FF4500", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Target size={16} color="white" strokeWidth={2.5} />
           </div>
-          <span style={{ fontSize: "15px", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>Goalpocalypse</span>
+          <span style={{ fontSize: "15px", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>Meridian</span>
         </div>
         <div>
           <h1 style={{ fontSize: "56px", fontWeight: 700, color: "white", letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: "20px" }}>
             Performance<br />
-            <span style={{ color: "rgba(255,255,255,0.25)" }}>redefined.</span>
+            <span style={{ color: "rgba(255,255,255,0.25)" }}>clarity.</span>
           </h1>
           <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.35)", lineHeight: 1.6, maxWidth: "400px" }}>
             Set goals that matter. Track what counts. Align your entire organization around outcomes that move the needle.
           </p>
         </div>
-        <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.15)" }}>© 2026 Goalpocalypse. All rights reserved.</p>
+        <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.15)" }}>© 2026 Meridian. All rights reserved.</p>
       </div>
 
       {/* Right — Form */}
@@ -147,7 +147,6 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Toggle */}
           <p style={{ marginTop: "24px", textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.3)" }}>
             {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
             <button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); }} style={{ background: "none", border: "none", cursor: "pointer", color: "white", fontFamily: "inherit", fontSize: "14px", fontWeight: 600, padding: 0, textDecoration: "underline", textDecorationColor: "rgba(255,255,255,0.3)" }}>
@@ -155,7 +154,6 @@ export default function LoginPage() {
             </button>
           </p>
 
-          {/* Demo */}
           {mode === "login" && (
             <div style={{ marginTop: "32px", paddingTop: "24px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
               <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.2)", marginBottom: "10px", letterSpacing: "0.06em", textTransform: "uppercase" }}>Demo accounts</p>
