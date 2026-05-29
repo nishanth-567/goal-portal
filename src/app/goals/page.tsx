@@ -1,17 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Target, Filter, Send, Lock, RotateCcw, Sparkles, AlertCircle } from "lucide-react";
-import { cn, formatDate } from "@/lib/utils";
-import { getScoreBg } from "@/lib/scoring";
-
-const STATUS_STYLES: Record<string, string> = {
-  DRAFT: "bg-slate-100 text-slate-700",
-  SUBMITTED: "bg-amber-100 text-amber-700",
-  APPROVED: "bg-blue-100 text-blue-700",
-  RETURNED: "bg-red-100 text-red-700",
-  LOCKED: "bg-emerald-100 text-emerald-700",
-};
+import { Plus, Target, Send, Sparkles, AlertCircle } from "lucide-react";
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([]);
@@ -53,75 +43,95 @@ export default function GoalsPage() {
 
   if (loading) {
     return (
-      <div className="p-8 flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
+      <div style={{ padding: "48px", display: "flex", alignItems: "center", justifyContent: "center", height: "300px" }}>
+        <div style={{ width: "32px", height: "32px", border: "2px solid #FF4500", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
       </div>
     );
   }
 
+  // Status badge styles for dark theme
+  const statusStyles: Record<string, { bg: string; color: string }> = {
+    DRAFT: { bg: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" },
+    SUBMITTED: { bg: "rgba(255,165,0,0.15)", color: "#FFA500" },
+    APPROVED: { bg: "rgba(52,199,89,0.15)", color: "#34C759" },
+    RETURNED: { bg: "rgba(255,69,0,0.15)", color: "#FF4500" },
+    LOCKED: { bg: "rgba(52,199,89,0.15)", color: "#34C759" },
+  };
+
+  const scoreBg = (score: number) => {
+    if (score >= 90) return "rgba(52,199,89,0.15)";
+    if (score >= 70) return "rgba(0,122,255,0.15)";
+    if (score >= 50) return "rgba(255,165,0,0.15)";
+    return "rgba(255,69,0,0.15)";
+  };
+
+  const scoreColor = (score: number) => {
+    if (score >= 90) return "#34C759";
+    if (score >= 70) return "#007AFF";
+    if (score >= 50) return "#FFA500";
+    return "#FF4500";
+  };
+
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div style={{ padding: "48px", maxWidth: "1000px", margin: "0 auto" }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "32px" }}>
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">My Goals</h1>
-          <p className="text-slate-500 mt-0.5">
+          <h1 style={{ fontSize: "28px", fontWeight: 700, color: "white", letterSpacing: "-0.02em" }}>My Goals</h1>
+          <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.4)", marginTop: "4px" }}>
             {goals.length} goals · {totalWeightage}% total weightage
             {!weightageOk && goals.length > 0 && (
-              <span className="ml-2 text-amber-600 text-sm">
-                ⚠ Must total 100% to submit
-              </span>
+              <span style={{ marginLeft: "8px", color: "#FFA500", fontSize: "12px" }}>⚠ Must total 100% to submit</span>
             )}
           </p>
         </div>
         <Link
           href="/goals/new"
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+          style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 18px", background: "#FF4500", color: "white", borderRadius: "10px", fontSize: "13px", textDecoration: "none", fontWeight: 600 }}
         >
           <Plus size={16} /> New Goal
         </Link>
       </div>
 
       {message && (
-        <div className="mb-4 flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+        <div style={{ marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px", padding: "12px 16px", background: "rgba(255,69,0,0.1)", border: "1px solid rgba(255,69,0,0.2)", borderRadius: "10px", fontSize: "13px", color: "#FF4500" }}>
           <AlertCircle size={16} /> {message}
-          <button onClick={() => setMessage("")} className="ml-auto text-red-400 hover:text-red-600">×</button>
+          <button onClick={() => setMessage("")} style={{ marginLeft: "auto", background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer" }}>×</button>
         </div>
       )}
 
       {/* Weightage progress bar */}
       {goals.length > 0 && (
-        <div className="mb-6 p-4 bg-white rounded-xl border border-slate-200">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-700">Total Weightage</span>
-            <span className={cn("text-sm font-semibold", weightageOk ? "text-emerald-600" : "text-amber-600")}>
+        <div style={{ marginBottom: "32px", padding: "16px", background: "rgba(255,255,255,0.03)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>Total Weightage</span>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: weightageOk ? "#34C759" : "#FFA500" }}>
               {totalWeightage}% / 100%
             </span>
           </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div style={{ height: "6px", background: "rgba(255,255,255,0.06)", borderRadius: "3px", overflow: "hidden" }}>
             <div
-              className={cn("h-full rounded-full transition-all", totalWeightage > 100 ? "bg-red-500" : weightageOk ? "bg-emerald-500" : "bg-amber-500")}
-              style={{ width: `${Math.min(totalWeightage, 100)}%` }}
+              style={{ height: "100%", background: totalWeightage > 100 ? "#FF4500" : weightageOk ? "#34C759" : "#FFA500", width: `${Math.min(totalWeightage, 100)}%`, borderRadius: "3px" }}
             />
           </div>
-          <p className="text-xs text-slate-400 mt-1">Min 10% per goal · Max 8 goals · Must total 100% to submit</p>
+          <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "6px" }}>Min 10% per goal · Max 8 goals · Must total 100% to submit</p>
         </div>
       )}
 
       {/* Filter tabs */}
-      <div className="flex gap-2 mb-4">
+      <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
         {["ALL", "DRAFT", "SUBMITTED", "LOCKED", "RETURNED"].map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
-              filter === s ? "bg-blue-600 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-            )}
+            style={{ padding: "8px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 500, cursor: "pointer", transition: "all 0.2s",
+              background: filter === s ? "#FF4500" : "rgba(255,255,255,0.03)",
+              color: filter === s ? "white" : "rgba(255,255,255,0.6)",
+              border: filter === s ? "none" : "1px solid rgba(255,255,255,0.1)" }}
           >
             {s === "ALL" ? "All" : s.charAt(0) + s.slice(1).toLowerCase()}
             {s !== "ALL" && (
-              <span className="ml-1 opacity-70">({goals.filter((g) => g.status === s).length})</span>
+              <span style={{ marginLeft: "4px", opacity: 0.6 }}>({goals.filter((g) => g.status === s).length})</span>
             )}
           </button>
         ))}
@@ -129,52 +139,53 @@ export default function GoalsPage() {
 
       {/* Goals list */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
-          <Target size={48} className="mx-auto text-slate-300 mb-3" />
-          <h3 className="text-slate-600 font-medium">No goals found</h3>
-          <p className="text-slate-400 text-sm mt-1">Create your first goal to get started.</p>
-          <Link href="/goals/new" className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">
+        <div style={{ textAlign: "center", padding: "80px 24px", background: "rgba(255,255,255,0.03)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.06)" }}>
+          <Target size={48} style={{ margin: "0 auto 12px", color: "rgba(255,255,255,0.2)" }} />
+          <h3 style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500, marginBottom: "6px" }}>No goals found</h3>
+          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", marginBottom: "20px" }}>Create your first goal to get started.</p>
+          <Link href="/goals/new" style={{ display: "inline-block", padding: "10px 20px", background: "#FF4500", color: "white", borderRadius: "8px", textDecoration: "none", fontSize: "13px", fontWeight: 600 }}>
             Create Goal
           </Link>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {filtered.map((goal) => {
             const lastCheckin = goal.checkins?.[goal.checkins.length - 1];
+            const status = statusStyles[goal.status] || statusStyles.DRAFT;
             return (
-              <div key={goal.id} className="bg-white rounded-xl border border-slate-200 p-5 hover:border-blue-300 transition-colors">
-                <div className="flex items-start gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <Link href={`/goals/${goal.id}`} className="font-semibold text-slate-800 hover:text-blue-600 truncate">
+              <div key={goal.id} style={{ background: "rgba(255,255,255,0.03)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.06)", padding: "20px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
+                      <Link href={`/goals/${goal.id}`} style={{ fontWeight: 600, color: "white", textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {goal.title}
                       </Link>
-                      <span className={cn("text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0", STATUS_STYLES[goal.status])}>
+                      <span style={{ fontSize: "11px", padding: "4px 8px", borderRadius: "6px", background: status.bg, color: status.color, fontWeight: 500 }}>
                         {goal.status === "LOCKED" ? "✓ Approved" : goal.status.charAt(0) + goal.status.slice(1).toLowerCase()}
                       </span>
                       {goal.aiQualityScore && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 flex items-center gap-1 flex-shrink-0">
+                        <span style={{ fontSize: "11px", padding: "4px 8px", borderRadius: "6px", background: "rgba(139,92,246,0.15)", color: "#8b5cf6", display: "flex", alignItems: "center", gap: "4px", fontWeight: 500 }}>
                           <Sparkles size={10} /> {goal.aiQualityScore}/100
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>
                       <span>{goal.thrustArea?.name}</span>
                       <span>·</span>
                       <span>{goal.uomType}</span>
                       {goal.target && <><span>·</span><span>Target: {goal.target} {goal.uomUnit}</span></>}
                       <span>·</span>
-                      <span className="font-medium text-slate-600">{goal.weightage}%</span>
+                      <span style={{ fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>{goal.weightage}%</span>
                     </div>
                     {goal.managerComment && (
-                      <p className="mt-2 text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2">
+                      <p style={{ marginTop: "8px", fontSize: "12px", color: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "8px 12px" }}>
                         💬 Manager: {goal.managerComment}
                       </p>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
                     {lastCheckin?.progressScore != null && (
-                      <span className={cn("text-xs px-2 py-1 rounded-lg font-medium", getScoreBg(lastCheckin.progressScore))}>
+                      <span style={{ fontSize: "12px", padding: "4px 10px", borderRadius: "6px", fontWeight: 600, background: scoreBg(lastCheckin.progressScore), color: scoreColor(lastCheckin.progressScore) }}>
                         {lastCheckin.progressScore.toFixed(0)}% score
                       </span>
                     )}
@@ -182,7 +193,7 @@ export default function GoalsPage() {
                       <button
                         onClick={() => submitGoal(goal.id)}
                         disabled={submitting === goal.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-xs font-medium transition-colors"
+                        style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 14px", background: "#FF4500", color: "white", borderRadius: "8px", fontSize: "12px", cursor: "pointer", opacity: submitting === goal.id ? 0.5 : 1 }}
                       >
                         <Send size={12} /> Submit
                       </button>
