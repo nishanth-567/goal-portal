@@ -8,9 +8,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
   if (!session) redirect("/login");
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#08080C" }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#000000" }}>
       <Sidebar />
-      <main style={{ flex: 1, overflow: "auto", backgroundColor: "#08080C" }}>
+      <main style={{ flex: 1, overflow: "auto", backgroundColor: "#000000" }}>
         {children}
       </main>
     </div>
